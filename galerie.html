@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie - ASCII Art Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="nav-menu">
+        <a href="index.html">Accueil</a>
+        <a href="galerie.html">Galerie</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+    <div class="container">
+        <h1>Galerie d'Images</h1>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="image1.jpg" alt="Image 1" class="gallery-image">
+                <div class="gallery-overlay">
+                    <button class="convert-btn" onclick="convertToAscii(this)">Convertir en ASCII</button>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image2.jpg" alt="Image 2" class="gallery-image">
+                <div class="gallery-overlay">
+                    <button class="convert-btn" onclick="convertToAscii(this)">Convertir en ASCII</button>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image3.jpg" alt="Image 3" class="gallery-image">
+                <div class="gallery-overlay">
+                    <button class="convert-btn" onclick="convertToAscii(this)">Convertir en ASCII</button>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image4.jpg" alt="Image 4" class="gallery-image">
+                <div class="gallery-overlay">
+                    <button class="convert-btn" onclick="convertToAscii(this)">Convertir en ASCII</button>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image5.jpg" alt="Image 5" class="gallery-image">
+                <div class="gallery-overlay">
+                    <button class="convert-btn" onclick="convertToAscii(this)">Convertir en ASCII</button>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="image6.jpg" alt="Image 6" class="gallery-image">
+                <div class="gallery-overlay">
+                    <button class="convert-btn" onclick="convertToAscii(this)">Convertir en ASCII</button>
+                </div>
+            </div>
+        </div>
+        <div id="ascii-output" class="ascii-output-container"></div>
+    </div>
+
+    <script>
+        const ASCII_CHARS = '@%#*+=-:. ';
+
+        function convertToAscii(button) {
+            const galleryItem = button.closest('.gallery-item');
+            const img = galleryItem.querySelector('.gallery-image');
+            const output = document.getElementById('ascii-output');
+            
+            // S'assurer que l'image est chargée
+            if (!img.complete) {
+                img.onload = function() {
+                    processImage(img, output);
+                };
+            } else {
+                processImage(img, output);
+            }
+        }
+
+        function processImage(img, output) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajuster la taille pour l'ASCII art
+            const maxWidth = 200;
+            const scale = maxWidth / img.naturalWidth;
+            canvas.width = maxWidth;
+            canvas.height = img.naturalHeight * scale;
+
+            // Dessiner l'image sur le canvas
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            try {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let ascii = '';
+
+                // Convertir en ASCII
+                for (let y = 0; y < canvas.height; y++) {
+                    for (let x = 0; x < canvas.width; x++) {
+                        const offset = (y * canvas.width + x) * 4;
+                        const r = imageData.data[offset];
+                        const g = imageData.data[offset + 1];
+                        const b = imageData.data[offset + 2];
+                        const brightness = (r + g + b) / 3;
+                        const charIndex = Math.floor((brightness / 255) * (ASCII_CHARS.length - 1));
+                        ascii += ASCII_CHARS[charIndex];
+                    }
+                    ascii += '\n';
+                }
+
+                // Afficher le résultat
+                output.textContent = ascii;
+                output.style.display = 'block';
+                output.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Erreur lors de la conversion:', error);
+                output.textContent = 'Erreur lors de la conversion de l\'image';
+                output.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html> 
